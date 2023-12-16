@@ -52,14 +52,24 @@ Point3D multiplyTwoPoints(Point3D point1, Point3D point2){
     return point3;
 }
 
-struct Point3D eye_pos, lookat_dir, right_dir, up_dir;
-int window_width = 840, window_height = 840, window_x_pos = 50, window_y_pos = 50;
+// struct Point3D eye_pos, lookat_dir, right_dir, up_dir;
+int window_width = 800, window_height = 800, window_x_pos = 70, window_y_pos = 70;
 char title[] = "Magic Cube";
 GLfloat rotateAngle = 45.0;
-double maxLength = 1.6, curLength = 1.6, changeRate = 0.1;
+double maxLength = 1.5, curLength = 1.5, changeRate = 0.1, fixedRadius = 0.577, radius = 0;
+// double maxLength = 1.0, curLength = 1.0, changeRate = 0.1;
 int rowPoints = 100;
-double maxRadius = maxLength / sqrt(3.0), radius = 0;
-double step = maxRadius / 16.0;
+// int rowPoints = 32;
+// double maxRadius = maxLength / sqrt(3.0), radius = 0;
+// double step = maxRadius / 16.0;
+
+// const GLfloat maxCylinderHeight = sqrt(2.0);
+// const GLfloat maxCylindeTheta = M_PI / 2.0;
+// const GLfloat cylinderMaxTranslationX = 1 / sqrt(2.0);
+// GLfloat cylinderTheta = maxCylindeTheta;
+// GLfloat cylinderHeight = maxCylinderHeight;
+// GLfloat cylinderTranslationX = cylinderMaxTranslationX;
+// GLfloat cylinderScale = 0;
 
 struct Camera
 {
@@ -222,30 +232,64 @@ void drawWholeOctahedron(){
     glPopMatrix();    
 }
 
+// void drawSphereFace(){
+//     struct Point3D points[rowPoints + 1][rowPoints + 1];
+
+//     for(int i = 0; i <= rowPoints; i++){
+//         // double tmp2 = (acos(-1) / 180.0f) * (45.0f - 90.0f * i / (rowPoints - 1));
+//         // struct Point3D point1 = Point3D(-sin(tmp2), cos(tmp2), 0);
+
+//         for(int j = 0; j <= rowPoints; j++){
+//             // double tmp1 = (acos(-1) / 180.0f) * (-45.0f + 90.0f * j / (rowPoints - 1));
+//             // struct Point3D point2 = Point3D(-sin(tmp1), 0, -cos(tmp1));
+//             // points[i][j] = multiplyTwoPoints(point1, point2);
+
+//             double x = -1 + (double)i / rowPoints * 2;
+// 		    double y = -1 + (double)j / rowPoints * 2;
+//             points[i][j] = Point3D(x, y, 1);
+
+//             double len = sqrt(points[i][j].x_val * points[i][j].x_val + points[i][j].y_val * points[i][j].y_val + points[i][j].z_val * points[i][j].z_val);
+//             points[i][j] = dividePointByNumber(points[i][j], len);
+//             points[i][j] = multiplyPointWithNumber(points[i][j], radius);
+//         }
+//     }
+
+//         for(int i =  0; i < rowPoints; i++){
+//             for(int j = 0; j < rowPoints; j++){
+//                 glBegin(GL_QUADS);
+//                 glVertex3f(points[i][j].x_val, points[i][j].y_val, points[i][j].z_val);
+//                 glVertex3f(points[i][j + 1].x_val, points[i][j + 1].y_val, points[i][j + 1].z_val);
+//                 glVertex3f(points[i + 1][j + 1].x_val, points[i + 1][j + 1].y_val, points[i + 1][j + 1].z_val);
+//                 glVertex3f(points[i + 1][j].x_val, points[i + 1][j].y_val, points[i + 1][j].z_val);
+//                 glEnd();
+//             }
+//         }
+// }
+
 void drawSphereFace(){
-    struct Point3D points[rowPoints + 1][rowPoints + 1];
+    struct Point3D points[rowPoints][rowPoints];
 
-    for(int i = 0; i <= rowPoints; i++){
-        // double tmp2 = (acos(-1) / 180.0f) * (45.0f - 90.0f * i / (rowPoints - 1));
-        // struct Point3D point1 = Point3D(-sin(tmp2), cos(tmp2), 0);
+    for(int i = 0; i < rowPoints; i++){
+        double tmp2 = (acos(-1) / 180.0f) * (45.0f - 90.0f * i / (rowPoints - 1));
+        struct Point3D point1 = Point3D(-sin(tmp2), cos(tmp2), 0);
 
-        for(int j = 0; j <= rowPoints; j++){
-            // double tmp1 = (acos(-1) / 180.0f) * (-45.0f + 90.0f * j / (rowPoints - 1));
-            // struct Point3D point2 = Point3D(-sin(tmp1), 0, -cos(tmp1));
-            // points[i][j] = multiplyTwoPoints(point1, point2);
+        for(int j = 0; j < rowPoints; j++){
+            double tmp1 = (acos(-1) / 180.0f) * (-45.0f + 90.0f * j / (rowPoints - 1));
+            struct Point3D point2 = Point3D(-sin(tmp1), 0, -cos(tmp1));
+            points[i][j] = multiplyTwoPoints(point1, point2);
 
-            double x = -1 + (double)i / rowPoints * 2;
-		    double y = -1 + (double)j / rowPoints * 2;
-            points[i][j] = Point3D(x, y, 1);
+            // double x = -1 + (double)i / rowPoints * 2;
+		    // double y = -1 + (double)j / rowPoints * 2;
+            // points[i][j] = Point3D(x, y, 1);
 
             double len = sqrt(points[i][j].x_val * points[i][j].x_val + points[i][j].y_val * points[i][j].y_val + points[i][j].z_val * points[i][j].z_val);
             points[i][j] = dividePointByNumber(points[i][j], len);
-            points[i][j] = multiplyPointWithNumber(points[i][j], radius);
+            points[i][j] = multiplyPointWithNumber(points[i][j], fixedRadius);
         }
     }
 
-        for(int i =  0; i < rowPoints; i++){
-            for(int j = 0; j < rowPoints; j++){
+        for(int i =  0; i < rowPoints - 1; i++){
+            for(int j = 0; j < rowPoints - 1; j++){
                 glBegin(GL_QUADS);
                 glVertex3f(points[i][j].x_val, points[i][j].y_val, points[i][j].z_val);
                 glVertex3f(points[i][j + 1].x_val, points[i][j + 1].y_val, points[i][j + 1].z_val);
@@ -256,47 +300,102 @@ void drawSphereFace(){
         }
 }
 
+// void drawOneSphere(){
+//         glTranslated(0, 0, curLength);
+//         // glScaled(sphereRadius, sphereRadius, sphereRadius);
+//         drawSphereFace();
+// }
+
 void drawOneSphere(){
-        glTranslated(0, 0, curLength);
-        // glScaled(sphereRadius, sphereRadius, sphereRadius);
+    glPushMatrix();
+        glTranslated(-curLength, 0, 0);
+        glScaled(radius, radius, radius);
         drawSphereFace();
+    glPopMatrix();
 }
+
+// void drawAllSpheres(){
+//     for(int i = 0; i < 4; i++){
+//         if(i % 2 == 0){
+//             glColor3f(1, 0, 1);
+//         }
+//         else{
+//             glColor3f(1, 1, 0);
+//         }
+
+//         glPushMatrix();
+//             glRotated(i * 90, 0, 1, 0);
+//             drawOneSphere();
+//         glPopMatrix();
+//     }
+
+//     glColor3f(0, 1, 1);
+//     glPushMatrix();
+//         glRotated(90, 1, 0, 0);
+//         drawOneSphere();
+//     glPopMatrix();
+
+//     glPushMatrix();
+//         glRotated(270, 1, 0, 0);
+//         drawOneSphere();
+//     glPopMatrix();
+// }
 
 void drawAllSpheres(){
+    glPushMatrix();
     for(int i = 0; i < 4; i++){
         if(i % 2 == 0){
-            glColor3f(1, 0, 1);
-        }
-        else{
             glColor3f(1, 1, 0);
         }
+        else{
+            glColor3f(1, 0, 1);
+        }
 
-        glPushMatrix();
-            glRotated(i * 90, 0, 1, 0);
-            drawOneSphere();
-        glPopMatrix();
-    }
-
-    glColor3f(0, 1, 1);
-    glPushMatrix();
-        glRotated(90, 1, 0, 0);
         drawOneSphere();
+        glRotated(90, 0, 1, 0);
+    }
     glPopMatrix();
 
     glPushMatrix();
-        glRotated(270, 1, 0, 0);
+        glColor3f(0, 1, 1);
+        glRotated(90, 0, 0, 1);
+        drawOneSphere();
+        glRotated(180, 0, 0, 1);
         drawOneSphere();
     glPopMatrix();
 }
+
+// void drawCylinderFace(){
+//     struct Point3D points1[rowPoints + 1];
+//     double angleDiff = 70.5287794 * acos(-1) / 180.0;
+//     double height = curLength * sqrt(2);
+
+//     for(int i = 0; i <= rowPoints; i++){
+//         double angleTheta = -angleDiff / 2 +  i * angleDiff / rowPoints;
+//         points1[i] = Point3D(radius * cos(angleTheta), radius * sin(angleTheta), height / 2);
+//     }
+
+//     for(int i = 0; i < rowPoints; i++){
+//         glBegin(GL_QUADS);
+//             glVertex3f(points1[i].x_val, points1[i].y_val, points1[i].z_val);
+//             glVertex3f(points1[i].x_val, points1[i].y_val, -points1[i].z_val);
+//             glVertex3f(points1[i + 1].x_val, points1[i + 1].y_val, -points1[i + 1].z_val);
+//             glVertex3f(points1[i + 1].x_val, points1[i + 1].y_val, points1[i + 1].z_val);
+//         glEnd();
+//     }
+// }
 
 void drawCylinderFace(){
     struct Point3D points1[rowPoints + 1];
-    double angleDiff = 70.5287794 * acos(-1) / 180.0;
+    // double angleDiff = 70.5287794 * acos(-1) / 180.0;
+    // double angleDiff = acos(-1) / 2.0;
+    double angleDiff = acos(-1) - acos(-1 / 3.0);
     double height = curLength * sqrt(2);
 
     for(int i = 0; i <= rowPoints; i++){
         double angleTheta = -angleDiff / 2 +  i * angleDiff / rowPoints;
-        points1[i] = Point3D(radius * cos(angleTheta), radius * sin(angleTheta), height / 2);
+        // points1[i] = Point3D(radius * cos(angleTheta), radius * sin(angleTheta), cylinderHeight / 2);
+        points1[i] = Point3D(fixedRadius * cos(angleTheta), fixedRadius * sin(angleTheta), height / 2);
     }
 
     for(int i = 0; i < rowPoints; i++){
@@ -309,11 +408,22 @@ void drawCylinderFace(){
     }
 }
 
+// void drawOneCylinder(){
+
+//     glPushMatrix();
+//         glRotatef(45, 0, 1, 0);
+//         glTranslatef(curLength / sqrt(2), 0, 0);
+//         drawCylinderFace();
+//     glPopMatrix();
+// }
+
 void drawOneCylinder(){
 
     glPushMatrix();
         glRotatef(45, 0, 1, 0);
+        // glTranslatef(cylinderTranslationX, 0, 0);
         glTranslatef(curLength / sqrt(2), 0, 0);
+        glScaled(radius, radius, 1);
         drawCylinderFace();
     glPopMatrix();
 }
@@ -418,21 +528,41 @@ void keyboardListener(unsigned char key, int x, int y){
             rotateCounterClockwise();
             break;
 
+        // case ',':
+        //     curLength -= 0.1;
+        //     radius += step;
+        //     if( curLength < 0 ) {
+        //         curLength = 0;
+        //         radius = maxRadius;
+        //     }
+        //     break;
+
+        // case '.':
+        //     curLength += 0.1;
+        //     radius -= step;
+        //     if( curLength > maxLength ) {
+        //         curLength = maxLength;
+        //         radius = 0;
+        //     }
+        //     break;
+
         case ',':
-            curLength -= 0.1;
-            radius += step;
-            if( curLength < 0 ) {
-                curLength = 0;
-                radius = maxRadius;
+            
+            if( curLength > 0.0 ) {
+                curLength -= 0.1;
+                radius += 0.1;
+                // cylinderHeight -= maxCylinderHeight / 16;
+                // cylinderTranslationX -= cylinderMaxTranslationX / 16;
             }
             break;
 
         case '.':
-            curLength += 0.1;
-            radius -= step;
-            if( curLength > maxLength ) {
-                curLength = maxLength;
-                radius = 0;
+            
+            if( curLength < maxLength ) {
+                curLength += 0.1;
+                radius -= 0.1;
+                // cylinderHeight += maxCylinderHeight / 16;
+                // cylinderTranslationX += cylinderMaxTranslationX / 16;
             }
             break;               
 
