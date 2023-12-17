@@ -2,12 +2,14 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+// Point Structure
 struct Point3D
 {
     double x_val;
     double y_val;
     double z_val;
 
+    // Constructor
     Point3D(){
         x_val = 0;
         y_val = 0;
@@ -20,6 +22,7 @@ struct Point3D
         z_val = z;
     }
 
+    // Copy Constructor
     Point3D(const Point3D& point){
         x_val = point.x_val;
         y_val = point.y_val;
@@ -27,42 +30,56 @@ struct Point3D
     }
 };
 
+
+// Add Two Points
 Point3D addTwoPoints(Point3D point1, Point3D point2){
     Point3D point3 = Point3D(point1.x_val + point2.x_val, point1.y_val + point2.y_val, point1.z_val + point2.z_val);
     return point3;
 }
 
+
+// Subtract Two Points
 Point3D subtractTwoPoints(Point3D point1, Point3D point2){
     Point3D point3 = Point3D(point1.x_val - point2.x_val, point1.y_val - point2.y_val, point1.z_val - point2.z_val);
     return point3;
 }
 
+
+// Multiply Point with a Number
 Point3D multiplyPointWithNumber(Point3D point1, double num){
     Point3D point2 = Point3D(point1.x_val * num, point1.y_val * num, point1.z_val * num);
     return point2;
 }
 
+
+// Divide Point with a Number
 Point3D dividePointByNumber(Point3D point1, double num){
     Point3D point2 = Point3D(point1.x_val / num, point1.y_val / num, point1.z_val / num);
     return point2;
 }
 
+
+// Multiply Two Points
 Point3D multiplyTwoPoints(Point3D point1, Point3D point2){
     Point3D point3 = Point3D(point1.y_val * point2.z_val - point1.z_val * point2.y_val, point1.z_val * point2.x_val - point1.x_val * point2.z_val, point1.x_val * point2.y_val - point1.y_val * point2.x_val);
     return point3;
 }
 
 
+// Global Variables
 int window_width = 800, window_height = 800, window_x_pos = 70, window_y_pos = 70;
 char title[] = "Magic Cube";
 GLfloat rotateAngle = 45.0;
 double maxLength = 1.5, curLength = 1.5, changeRate = 0.1, fixedRadius = 0.577, radius = 0;
 int rowPoints = 100;
 
+
+// Camera Implementation
 struct Camera
 {
     Point3D eye_pos, lookat_dir, right_dir, up_dir;
 
+    // Constructor
     Camera(){
         eye_pos = Point3D(7, 0, 2);
         lookat_dir = Point3D(-1, 0, 0);
@@ -70,10 +87,12 @@ struct Camera
         up_dir = Point3D(0, 0, 1);
     }
 
+    // Look Function
     void startLooking(){
         gluLookAt(eye_pos.x_val, eye_pos.y_val, eye_pos.z_val, eye_pos.x_val + lookat_dir.x_val, eye_pos.y_val + lookat_dir.y_val, eye_pos.z_val + lookat_dir.z_val, up_dir.x_val, up_dir.y_val, up_dir.z_val);
     }
 
+    // Eye Position Change
     void moveForward(){
         eye_pos = addTwoPoints(eye_pos, lookat_dir);
     }
@@ -98,6 +117,7 @@ struct Camera
         eye_pos = subtractTwoPoints(eye_pos, up_dir);
     }
 
+    // Position Change
     void lookLeft(){
         right_dir = addTwoPoints(multiplyPointWithNumber(right_dir, cos(changeRate)), multiplyPointWithNumber(lookat_dir, sin(changeRate)));
         lookat_dir = subtractTwoPoints(multiplyPointWithNumber(lookat_dir, cos(changeRate)), multiplyPointWithNumber(right_dir, sin(changeRate)));
@@ -128,6 +148,7 @@ struct Camera
         right_dir = subtractTwoPoints(multiplyPointWithNumber(right_dir, cos(-changeRate)), multiplyPointWithNumber(up_dir, sin(-changeRate)));
     }
 
+    // Bonus Task
     void moveUpWithoutChangingReferencePoint(){
         eye_pos.z_val += 0.1;
         lookat_dir.z_val -= 0.1;
@@ -140,6 +161,8 @@ struct Camera
 
 };
 
+
+// Rotate
 void rotateClockwise(){
     rotateAngle += 5.0f;
 }
@@ -150,11 +173,15 @@ void rotateCounterClockwise(){
 
 Camera camera;
 
+
+// Initialize OpenGL
 void initGL(){
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
 
+
+// Drawing Three Axes
 void drawThreeAxes(){
     glLineWidth(5);
     glBegin(GL_LINES);
@@ -172,6 +199,8 @@ void drawThreeAxes(){
     glEnd();    
 }
 
+
+// Drawing Base Triangle
 void drawBaseTriangle(){
     glBegin(GL_TRIANGLES);
         glVertex3f(1, 0, 0);
@@ -180,6 +209,8 @@ void drawBaseTriangle(){
     glEnd();    
 }
 
+
+// Ocathedron Upper Surface
 void drawOctahedronUpper(){
 
     double translation = (maxLength - curLength) / 3.0;
@@ -200,6 +231,8 @@ void drawOctahedronUpper(){
     }
 }
 
+
+// Full Octahedron
 void drawWholeOctahedron(){
     glPushMatrix();
         drawOctahedronUpper();
@@ -212,9 +245,11 @@ void drawWholeOctahedron(){
 }
 
 
+// Draw One Face of Sphere
 void drawSphereFace(){
     struct Point3D points[rowPoints][rowPoints];
 
+    // Generate Points
     for(int i = 0; i < rowPoints; i++){
         double tmp2 = (acos(-1) / 180.0f) * (45.0f - 90.0f * i / (rowPoints - 1));
         struct Point3D point1 = Point3D(-sin(tmp2), cos(tmp2), 0);
@@ -230,19 +265,21 @@ void drawSphereFace(){
         }
     }
 
-        for(int i =  0; i < rowPoints - 1; i++){
-            for(int j = 0; j < rowPoints - 1; j++){
-                glBegin(GL_QUADS);
+    //  Generate Sphere Face Using Quads
+    for(int i =  0; i < rowPoints - 1; i++){
+        for(int j = 0; j < rowPoints - 1; j++){
+            glBegin(GL_QUADS);
                 glVertex3f(points[i][j].x_val, points[i][j].y_val, points[i][j].z_val);
                 glVertex3f(points[i][j + 1].x_val, points[i][j + 1].y_val, points[i][j + 1].z_val);
                 glVertex3f(points[i + 1][j + 1].x_val, points[i + 1][j + 1].y_val, points[i + 1][j + 1].z_val);
                 glVertex3f(points[i + 1][j].x_val, points[i + 1][j].y_val, points[i + 1][j].z_val);
-                glEnd();
-            }
+            glEnd();
         }
+    }
 }
 
 
+// Draw One Sphere
 void drawOneSphere(){
     glPushMatrix();
         glTranslated(-curLength, 0, 0);
@@ -252,6 +289,7 @@ void drawOneSphere(){
 }
 
 
+// Draw All Spheres
 void drawAllSpheres(){
     glPushMatrix();
     for(int i = 0; i < 4; i++){
@@ -277,16 +315,19 @@ void drawAllSpheres(){
 }
 
 
+// Draw Cylinder Face
 void drawCylinderFace(){
     struct Point3D points1[rowPoints + 1];
     double angleDiff = acos(-1) - acos(-1 / 3.0);
     double height = curLength * sqrt(2);
 
+    // Generate Points
     for(int i = 0; i <= rowPoints; i++){
         double angleTheta = -angleDiff / 2 +  i * angleDiff / rowPoints;
         points1[i] = Point3D(fixedRadius * cos(angleTheta), fixedRadius * sin(angleTheta), height / 2);
     }
 
+    // Generate Cylinder Face Using Quads
     for(int i = 0; i < rowPoints; i++){
         glBegin(GL_QUADS);
             glVertex3f(points1[i].x_val, points1[i].y_val, points1[i].z_val);
@@ -298,6 +339,7 @@ void drawCylinderFace(){
 }
 
 
+// Draw One Cylinder
 void drawOneCylinder(){
 
     glPushMatrix();
@@ -308,6 +350,8 @@ void drawOneCylinder(){
     glPopMatrix();
 }
 
+
+// Draw Four Cylinders
 void drawCylindersForOneAxis(){
     glPushMatrix();
     for(int i = 0; i < 4; i++){
@@ -317,6 +361,8 @@ void drawCylindersForOneAxis(){
     glPopMatrix();
 }
 
+
+// Draw All Cylinders
 void drawAllCylinders(){
     glPushMatrix();
     glColor3f(1.0, 0, 0);
@@ -331,12 +377,13 @@ void drawAllCylinders(){
     glPopMatrix();
 }
 
+
+// Display Function
 void display() {
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
-   glMatrixMode(GL_MODELVIEW);     // To operate on model-view matrix
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glMatrixMode(GL_MODELVIEW);  
  
-   // Render a color-cube consisting of 6 quads with different colors
-   glLoadIdentity();                 // Reset the model-view matrix
+   glLoadIdentity();       
 
    camera.startLooking();
 
@@ -346,24 +393,24 @@ void display() {
    drawAllSpheres();
    drawAllCylinders();
 
-   glutSwapBuffers();  // Swap the front and back frame buffers (double buffering)
+   glutSwapBuffers();
 }
 
-void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
-   // Compute aspect ratio of the new window
-   if (height == 0) height = 1;                // To prevent divide by 0
+void reshape(GLsizei width, GLsizei height) {
+   
+   if (height == 0) 
+    height = 1;           
+
    GLfloat aspect = (GLfloat)width / (GLfloat)height;
- 
-   // Set the viewport to cover the new window
    glViewport(0, 0, width, height);
  
-   // Set the aspect ratio of the clipping volume to match the viewport
-   glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
-   glLoadIdentity();             // Reset
-   // Enable perspective projection with fovy, aspect, zNear and zFar
+   glMatrixMode(GL_PROJECTION);  
+   glLoadIdentity();  
+
    gluPerspective(80.0f, aspect, 1.0f, 1000.0f);
 }
 
+// Keyboard Functionalities
 void keyboardListener(unsigned char key, int x, int y){
     switch(key){
 
@@ -413,8 +460,6 @@ void keyboardListener(unsigned char key, int x, int y){
             if( curLength > 0.0 ) {
                 curLength -= 0.1;
                 radius += 0.1;
-                // cylinderHeight -= maxCylinderHeight / 16;
-                // cylinderTranslationX -= cylinderMaxTranslationX / 16;
             }
             break;
 
@@ -423,8 +468,6 @@ void keyboardListener(unsigned char key, int x, int y){
             if( curLength < maxLength ) {
                 curLength += 0.1;
                 radius -= 0.1;
-                // cylinderHeight += maxCylinderHeight / 16;
-                // cylinderTranslationX += cylinderMaxTranslationX / 16;
             }
             break;               
 
@@ -434,6 +477,8 @@ void keyboardListener(unsigned char key, int x, int y){
     glutPostRedisplay();
 }
 
+
+// Special Key Functionalities
 void specialKeyboardListener(int key, int x, int y){
     switch(key){
         case GLUT_KEY_UP:
@@ -468,16 +513,19 @@ void specialKeyboardListener(int key, int x, int y){
 
 
 int main(int argc, char** argv){
-   glutInit(&argc, argv);            // Initialize GLUT
-   glutInitWindowSize(window_width, window_height);   // Set the window's initial width & height
-   glutInitWindowPosition(window_x_pos, window_y_pos); // Position the window's initial top-left corner
-   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB); // Enable double buffered mode
-   glutCreateWindow(title);          // Create window with the given title
-   glutDisplayFunc(display);       // Register callback handler for window re-paint event
-   glutReshapeFunc(reshape);       // Register callback handler for window re-size event
-   glutKeyboardFunc(keyboardListener);  // Register callback handler for keyboard Event
-   glutSpecialFunc(specialKeyboardListener);    // Register callback handler for special key Event
-   initGL();                       // Our own OpenGL initialization
-   glutMainLoop();                 // Enter the infinite event-processing loop
+   glutInit(&argc, argv);
+
+   glutInitWindowSize(window_width, window_height); 
+   glutInitWindowPosition(window_x_pos, window_y_pos);
+   glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
+   glutCreateWindow(title);
+            
+   glutDisplayFunc(display);     
+   glutReshapeFunc(reshape);     
+   glutKeyboardFunc(keyboardListener); 
+   glutSpecialFunc(specialKeyboardListener);  
+
+   initGL();                    
+   glutMainLoop();             
    return 0;
 }
